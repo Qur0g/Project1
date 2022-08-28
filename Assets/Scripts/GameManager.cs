@@ -16,7 +16,6 @@ public class GameManager : MonoBehaviour
     private SoundManager soundManager;
 
     private int countBlocks;
-    private int index = 0;
     private int doneLevels;
 
     void Start()
@@ -49,16 +48,17 @@ public class GameManager : MonoBehaviour
 
         for (int i = 0; i < countBlocks; i++)
         {
-            yield return new WaitForSeconds(0.5f);
+            yield return new WaitForSeconds(0.25f);
 
             levelColliders[i].enabled = true;
             levelSprites[i].color = Color.Lerp(Color.yellow, new Color32(0, 173, 84, 255), (float)i / countBlocks);
             levelColliders[i].enabled = false;
 
+            audioSource.pitch = 1f + i * 0.05f;
             audioSource.PlayOneShot(audioSource.clip);
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.25f);
 
         for (int i = 0; i < countBlocks; i++)
         {
@@ -69,57 +69,75 @@ public class GameManager : MonoBehaviour
         levelObjects[0].GetComponent<Animator>().enabled = true;
     }
 
+    private int index = 0;
+
     public void CheckOrder(GameObject obj)
     {
         if (obj == levelObjects[index])
         {
-            audioSource.PlayOneShot(soundManager.goodClick);
-
-            if (index == 0)
-            {
-                obj.GetComponent<Animator>().enabled = false;
-            }
-
-            obj.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.yellow, new Color32(0, 173, 84, 255), (float)index / countBlocks);
-            obj.GetComponent<BoxCollider2D>().enabled = false;
-            index++;
+            GoodClick(obj);
         }
         else
         {
-            audioSource.PlayOneShot(soundManager.loseSound);
-
-            GameObject.Find("PostProcessing").GetComponent<PostProcessingController>().SettingsToogle(true);
-
-            obj.GetComponent<SpriteRenderer>().color = Color.red;
-
-            Lose.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
-            Instantiate(Lose, new Vector3(0, 0, 0), Quaternion.identity); 
-
-            for(int i = 0; i < countBlocks; i++)
-            {
-                levelColliders[i].enabled = false;
-            }
+            LoseEvent(obj);
         }
 
         if(index == countBlocks)
         {
-            audioSource.PlayOneShot(soundManager.winSound);
-
-            GameObject.Find("PostProcessing").GetComponent<PostProcessingController>().SettingsToogle(true);
-
-            Win.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
-            Instantiate(Win, new Vector3(0, 0, 0), Quaternion.identity);
-
-            for (int i = 0; i < countBlocks; i++)
-            {
-                levelColliders[i].enabled = false;
-            }
-
-            if (SceneManager.GetActiveScene().buildIndex - doneLevels == 2)
-            {
-                doneLevels++;
-            }
+            WinEvent();
         }  
+    }
+
+    private void GoodClick(GameObject obj)
+    {
+        audioSource.pitch = 1f + index * 0.05f;
+        audioSource.PlayOneShot(soundManager.goodClick);
+
+        if (index == 0)
+        {
+            obj.GetComponent<Animator>().enabled = false;
+        }
+
+        obj.GetComponent<SpriteRenderer>().color = Color.Lerp(Color.yellow, new Color32(0, 173, 84, 255), (float)index / countBlocks);
+        obj.GetComponent<BoxCollider2D>().enabled = false;
+        index++;
+    }
+
+    private void WinEvent()
+    {
+        audioSource.PlayOneShot(soundManager.winSound);
+
+        GameObject.FindGameObjectWithTag("PostProcess").GetComponent<PostProcessingController>().SettingsToogle(true);
+
+        Win.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
+        Instantiate(Win, new Vector3(0, 0, 0), Quaternion.identity);
+
+        for (int i = 0; i < countBlocks; i++)
+        {
+            levelColliders[i].enabled = false;
+        }
+
+        if (SceneManager.GetActiveScene().buildIndex - doneLevels == 2)
+        {
+            doneLevels++;
+        }
+    }
+
+    private void LoseEvent(GameObject obj)
+    {
+        audioSource.PlayOneShot(soundManager.loseSound);
+
+        GameObject.FindGameObjectWithTag("PostProcess").GetComponent<PostProcessingController>().SettingsToogle(true);
+
+        obj.GetComponent<SpriteRenderer>().color = Color.red;
+
+        Lose.GetComponentInChildren<Canvas>().worldCamera = Camera.main;
+        Instantiate(Lose, new Vector3(0, 0, 0), Quaternion.identity);
+
+        for (int i = 0; i < countBlocks; i++)
+        {
+            levelColliders[i].enabled = false;
+        }
     }
 
     private void OnDestroy()

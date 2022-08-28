@@ -9,15 +9,15 @@ public class PostProcessingController : MonoBehaviour
 
     void Start()
     {
-        postProcess = GameObject.Find("PostProcessing").GetComponent<PostProcessVolume>().profile;
+        postProcess = gameObject.GetComponent<PostProcessVolume>().profile;
 
         postProcess.GetSetting<ChromaticAberration>().enabled.value = false;
-        postProcess.GetSetting<LensDistortion>().enabled.value = false;
+        postProcess.GetSetting<Bloom>().enabled.value = false;
     }
 
     public void SettingsToogle(bool flag)
     {
         postProcess.GetSetting<ChromaticAberration>().enabled.value = flag;
-        postProcess.GetSetting<LensDistortion>().enabled.value = flag;
+        postProcess.GetSetting<Bloom>().enabled.value = flag;
     }
 }

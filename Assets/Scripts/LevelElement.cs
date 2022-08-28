@@ -8,7 +8,7 @@ public class LevelElement : MonoBehaviour
 
     private void Start()
     {
-        gameManager = GameObject.Find("GameManager");
+        gameManager = GameObject.Find("GameManager");      
     }
 
     private void OnMouseDown()

@@ -14,7 +14,11 @@ public class SceneController : MonoBehaviour
 
     public void NextLevel()
     {
-        SceneManager.LoadScene("Level" + SceneManager.GetActiveScene().buildIndex);
+        if (SceneManager.sceneCountInBuildSettings > SceneManager.GetActiveScene().buildIndex + 1)
+            SceneManager.LoadScene("Level" + SceneManager.GetActiveScene().buildIndex);
+
+        else
+            SceneManager.LoadScene("Levels");          
     }
 
     public void RestartLevel()
